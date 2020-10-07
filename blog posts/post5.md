@@ -201,7 +201,6 @@ SUB Base64Encode (string)
     Let vbase_Len2 = Null();
 
 END SUB
-
 ```
 
 This script simply adds a TRACE to confirm that this all worked and then drops our tables and nullifies our helper variables.
