@@ -1,0 +1,63 @@
+Let string = '"' & 'String goes here!' & '"';
+
+// ####################################################################
+
+SUB Base64Encode (string)
+
+    Let vbase_String = '$(string)';
+    Let vbase_Base64Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    Let vbase_QuotePad = 1;
+
+    Trace #### Our string = $(vbase_String);
+ 
+ 
+    base_string_table_a:
+    LOAD *
+      , RowNo() as base_Character_Number
+      , text(repeat(0, 8 - len(num(ord(base_Character), '(BIN)'))) & num(ord(base_Character), '(BIN)')) as base_Binary
+    ;
+    LOAD
+        Mid( mid('$(vbase_String)', 1+$(vbase_QuotePad), len('$(vbase_String)')-($(vbase_QuotePad)*2)),  IterNo(),  1 ) as base_Character
+    AutoGenerate 1 While IterNo() <= len('$(vbase_String)')-($(vbase_QuotePad)*2);
+
+
+    base_full_binary:
+    LOAD *
+      , RowNo() as base_Binary_Index
+      , Mid('$(vbase_Base64Chars)', base_Base64_Index + 1, 1) as base_Base64_Character
+    ;
+    LOAD *
+      , num(num#(base_New_Bit_Pattern, '(BIN)')) as base_Base64_Index
+    ;
+    LOAD *
+      , mid(base_Full_Binary, ( ( IterNo() - 1 ) * 6 ) + 1, 6) as base_New_Bit_Pattern
+    WHILE IterNo() <= Div( len(base_Full_Binary) , 6)
+    ;
+    LOAD *
+      , text( base_Full_Binary_No_Pad & Repeat(0, num#(Frac(Fabs((Mod(len(base_Full_Binary_No_Pad), 24) - 24) / 6)) * 6) ) ) as base_Full_Binary
+    ;
+    LOAD
+        text( Concat(base_Binary, '', base_Character_Number) ) as base_Full_Binary_No_Pad
+    Resident base_string_table_a;
+
+
+    let vbase_Len1 = len(peek('base_Full_Binary', 0, 'base_full_binary'));
+    let vbase_Len2 = len(peek('base_Full_Binary_No_Pad', 0, 'base_full_binary'));
+
+
+    base_Base64_Encoded:
+    LOAD
+        Concat(base_Base64_Character, '', base_Binary_Index) & repeat('=', div( 24 - mod($(vbase_Len2), 25) - num#(Frac(Fabs((Mod($(vbase_Len2), 24) - 24) / 6)) * 6) , 6) ) as base_Base64_Encoded_String
+    Resident base_full_binary;
+
+
+    Let vBase64String = peek('base_Base64_Encoded_String', 0, 'base_Base64_Encoded');
+    Trace #### Encoded string available from the vBase64String variable!;
+
+    Drop Tables [base_Base64_Encoded], [base_full_binary], [base_string_table_a];
+    Let vbase_String = Null();
+    Let vbase_Base64Chars = Null();
+    Let vbase_Len1 = Null();
+    Let vbase_Len2 = Null();
+
+END SUB
